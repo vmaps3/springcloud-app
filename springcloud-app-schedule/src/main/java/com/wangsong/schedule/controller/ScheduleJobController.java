@@ -1,11 +1,16 @@
 package com.wangsong.schedule.controller;
 
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.wangsong.common.model.CodeEnum;
+import com.wangsong.common.model.Result;
 import com.wangsong.system.api.SystemAPI;
 import com.wangsong.system.model.UserDO;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -44,6 +49,17 @@ public class ScheduleJobController {
         return client.getUser(userDO);
     }
 
+    @HystrixCommand(fallbackMethod = "test")
+    @RequestMapping(value = "/list")
+    @ResponseBody
+    public Result list() {
+        return new Result(CodeEnum.SUCCESS.getCode(), 1);
+    }
+
+
+    public Result test() {
+        return new Result(CodeEnum.SUCCESS.getCode(), 2);
+    }
 
 
 }

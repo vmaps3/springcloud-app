@@ -26,18 +26,12 @@ public class DictController extends BaseController {
     @Autowired
     private DictService dictService;
 
-    @HystrixCommand(fallbackMethod = "test")
     @ApiOperation(value = "列表", httpMethod = "POST")
     @PreAuthorize("hasAuthority('/system/dict/list')")
     @RequestMapping(value = "/list")
     @ResponseBody
     public Result list(@ModelAttribute DictPage dict) {
         return new Result(CodeEnum.SUCCESS.getCode(), dictService.findTByPage(dict));
-    }
-
-
-    public Result test(@ModelAttribute DictPage dict) {
-        return new Result(CodeEnum.SUCCESS.getCode(), dict);
     }
 
     @ApiOperation(value = "增加", httpMethod = "POST")

@@ -43,11 +43,10 @@
 - 2.启动redis
 - 3.启动注册中心springcloud-app-eureka
 - 4.启动配置中心springcloud-app-config
-- 5.启动路由中心springcloud-app-zuul
-- 6.启动权限中心springcloud-app-system
-- 7.启动调度中心springcloud-app-schedule
-- 8.启动网关中心springcloud-app-zuul
-- 9.访问端口http://127.0.0.1:1101/html/login.html
+- 5.启动权限中心springcloud-app-system
+- 6.启动调度中心springcloud-app-schedule
+- 7.启动网关中心springcloud-app-zuul
+- 8.访问端口http://127.0.0.1:1101/html/login.html
 
 ## qq交流群
 

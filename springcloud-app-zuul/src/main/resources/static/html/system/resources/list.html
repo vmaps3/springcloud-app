@@ -1,0 +1,86 @@
+<!DOCTYPE html >
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>User list</title>
+<script type="text/javascript" src="../../js/include.js"></script>
+<script type="text/javascript">
+function append(){
+	var t = $('#tt');
+	var node = t.tree('getSelected');
+	window.location=htmlURL+'/system/resources/add.html?pid='+node.id
+}
+function removeit(){
+	var node = $('#tt').tree('getSelected');
+	
+	 $.messager.confirm("确认", "确认删除吗？", function (r) {
+	        if (r) {
+	        	$('#tt').tree('remove', node.target);
+	        	$.ajax({   
+				     url:url+'/system/resources/delete',
+				     type:'post',   
+				     data:"id="+node.id,
+				     success:function(data){   
+				    	 if(data.result=="success"){
+				        	window.location=htmlURL+"/system/resources/list.html";
+				        }else{
+				        	$.messager.alert('提示',data.msg);
+				        }
+				     }
+				});
+	        }
+	 });
+}
+function up(){
+	var node = $('#tt').tree('getSelected');
+	window.location=htmlURL+'/system/resources/update.html?id='+node.id;
+	      
+}
+
+$(function(){
+		$.ajax({
+             url:url+"/system/resources/list",
+             type:'post',
+             success:function(data){
+                	$('#tt').tree('loadData',data.data);
+             }
+        });
+if(!getResources("/system/resources/add")){
+        $('#add').hide();
+	}
+
+	if(!getResources("/system/resources/update")){
+        $('#update').hide();
+	}
+
+	if(!getResources("/system/resources/delete")){
+        $('#delete').hide();
+	}
+});
+
+</script>
+</head>
+<body >
+  	
+   
+	<ul id="tt" class="easyui-tree" data-options="
+
+			animate: true,
+			onContextMenu: function(e,node){
+				e.preventDefault();
+				$(this).tree('select',node.target);
+				$('#mm').menu('show',{
+					left: e.pageX,
+					top: e.pageY
+				});
+			}
+		"></ul>
+    
+   
+    <div id="mm" class="easyui-menu" style="width:120px;">
+			<div id ="add" onclick="append()" data-options="iconCls:'icon-add'">添加</div>
+			<div id ="update" onclick="up()" data-options="iconCls:'icon-edit'">更改</div>
+			<div id ="delete" onclick="removeit()" data-options="iconCls:'icon-remove'">删除</div>
+	</div>
+</body>
+</html>

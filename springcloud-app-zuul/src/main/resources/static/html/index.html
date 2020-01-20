@@ -1,0 +1,118 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title></title>
+    <script type="text/javascript" src="js/include.js"></script>
+    <script type="text/javascript">
+		function addTab(title, url){
+			if ($('#tt').tabs('exists', title)){
+				$('#tt').tabs('close',title);
+			} 
+			var content = '<iframe scrolling="auto" frameborder="0"  src="'+url+'" style="width:100%;height:100%;"></iframe>';
+			$('#tt').tabs('add',{
+				title:title,
+				content:content,
+				closable:true
+			});
+			
+		}
+
+		$(function(){
+			var json=[{"text": "菜单","children":[]}];
+            var j=0
+			if(getResources("/system")){
+			    var system={"text": "系统管理","children":[]};
+			    var i=0
+                if(getResources("/system/user")){
+                    system.children[i]={"text": "用户管理","attributes": {"url": "/system/user/list.html"}};
+                    i+=1;
+                }
+                if(getResources("/system/role")){
+                     system.children[i]={"text": "角色管理","attributes": {"url": "/system/role/list.html"}};
+                     i+=1;
+                }
+                if(getResources("/system/resources")){
+                    system.children[i]={"text": "权限管理","attributes": {"url": "/system/resources/list.html"}};
+                    i+=1;
+                }
+                if(getResources("/system/dict")){
+                    system.children[i]={"text": "字典管理","attributes": {"url": "/system/dict/list.html"}};
+                    i+=1;
+                }
+                json[0].children[j]=system;
+                j+=1
+			}
+            $('#tree').tree({
+				data: json,
+			 	onClick: function(node){
+			       if($('#tree').tree('isLeaf',node.target)){//判断是否是叶子节点
+			    	   addTab(node.text,htmlURL+node.attributes.url)
+			       }
+			    }
+			});
+		});
+		function logout(){
+			  $.messager.confirm("确认", "确认注销吗？", function (r) {
+			        if (r) {
+						$.ajax({   
+							url:url+"/logoutJSON",   
+							success:function(data){   	
+							}
+						});
+						$.cookie('token', '', { expires: -1 });
+						window.location=htmlURL+"/login.html";
+			        }
+			    });
+		}
+		function edit(){
+			 addTab("更改密码", htmlURL+"/system/user/updatePassword.html");
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </script>
+</head>
+
+
+<body class="easyui-layout">
+<div data-options="region:'north'" style="height:70px;">
+    <div style="margin-top: 20px;padding-left: 50px;">
+        <span style="font-size: 20px;"></span>
+    </div>
+</div>
+
+
+<div data-options="region:'west',title:'菜单'" style="width:200px;">
+    <div id="tree"></div>
+
+</div>
+<div id="tt" class="easyui-tabs" data-options="region:'center',border:false,tools:'#tab-tools'">
+    <div title="首页" style="padding:10px">
+        <p style="font-size:14px"></p>
+
+    </div>
+
+</div>
+<div id="tab-tools">
+    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-edit'"
+       onclick="edit()">更改密码</a>
+    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-no'"
+       onclick="logout()">退出</a>
+</div>
+</body>
+</html>

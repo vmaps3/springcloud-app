@@ -1,0 +1,81 @@
+
+
+<html>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<head>
+		<title>My JSP 'updateUser.jsp' starting page</title>
+		<script type="text/javascript" src="../../js/include.js"></script>
+		<script type="text/javascript">
+			function submitForm(){
+				if($("#ff").form('validate')==true){
+					$.ajax({   
+					     url:url+"/system/role/update",   
+					     type:$("#ff").attr("method"),   
+					     data:$("#ff").serializeArray(),
+					     success:function(data){   
+					    	 if(data.result=="success"){
+					        	toList();
+					        }else{
+					        	$.messager.alert('提示',data.msg);
+					        }
+					     }
+					});
+				}
+			}
+			function toList(){
+				window.location=htmlURL+"/system/role/list.html";
+			}
+			$(function(){ 
+				$.ajax({
+             url:url+"/system/resources/list",
+             type:'post',
+             success:function(data){
+                	$('#cc').combotree('loadData',data.data);
+                	$.ajax({
+				     url:url+'/system/role/selectByPrimaryKey',
+				     type:'post',
+				     data:'id='+getQueryString("id"),
+				     success:function(data){
+				     var v=data.data
+				    	 $('#ff').form('load',v);
+						var s= new Array();
+						for(var i=0;i<v.roleResourcesList.length;i++){
+							s.push(v.roleResourcesList[i].resourcesId);
+						}
+						$("#cc").combotree('setValues',s);
+				     }
+				});
+             }
+});
+				
+			}); 
+		</script>
+	</head>
+
+	<body>
+		<form id="ff"  action="" method="POST">
+			<input type="hidden" name="id" >
+			<table>
+				<tr>
+					<td>
+						名称: 
+					</td>
+					<td>
+						<input type="text"   name="name" required="true" validType="length[1,25]" class="easyui-textbox">
+					</td>
+				</tr>
+				<tr>
+					<td>权限:</td>
+					<td>
+						<input name="resourcesId" id="cc"  panelHeight="auto" cascadeCheck ="false" required="true"  class="easyui-combotree" data-options="" multiple >
+					</td>
+				</tr>
+				
+			</table>
+		</form>
+		<div id="dlg-buttons">
+			<a href="javascript:void(0)" class="easyui-linkbutton" onclick="submitForm()">保存</a>
+			<a href="javascript:void(0)" class="easyui-linkbutton"  onclick="toList()">返回</a>
+		</div>
+	</body>
+</html>

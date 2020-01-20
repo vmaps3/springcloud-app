@@ -1,0 +1,99 @@
+<!DOCTYPE html >
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>User list</title>
+<script type="text/javascript" src="../../js/include.js"></script>
+<script type="text/javascript">
+//删除
+function del(){
+	var row = $("#dg").datagrid('getSelections');
+	if(row.length!=0) {
+		 $.messager.confirm("确认", "确认删除吗？", function (r) {
+		        if (r) {
+		        	var myArray=new Array();
+		        	for(var i=0;i<row.length;i++){
+		        		myArray.push(row[i].id);
+		        	}
+		        	$.ajax({   
+					     url:url+'/system/user/delete',   
+					     type:'post',   
+					     data:"id="+myArray,
+					     success:function(data){   
+					    	 if(data.result=="success"){
+					        	window.location=htmlURL+"/system/user/list.html";
+					        }else{
+					        	$.messager.alert('提示',data.msg);
+					        }
+					     }
+					});
+		        }
+		 });
+	}else{
+		$.messager.alert('提示','请选择一条');
+	}
+}
+
+//弹窗修改
+function upd(){
+	var row =  $("#dg").datagrid('getSelections');
+	if(row.length==1){
+		window.location=htmlURL+"/system/user/update.html?id="+row[0].id;
+	}else{
+		$.messager.alert('提示','请选择一条');
+	}
+}
+
+function cx(){
+	var obj=$("#searchFrom").serializeObject();
+	  $.ajax({
+             url:url+"/system/user/list",
+             data:obj,
+             type:'post',
+             success:function(data){
+                	$('#dg').datagrid('loadData',data.data);
+             }
+        });
+}
+function add(){
+	window.location=htmlURL+"/system/user/add.html";
+}
+$(function(){
+cx();
+	if(!getResources("/system/user/add")){
+        $('#add').hide();
+	}
+
+	if(!getResources("/system/user/update")){
+        $('#update').hide();
+	}
+
+	if(!getResources("/system/user/delete")){
+        $('#delete').hide();
+	}
+});
+</script>
+</head>
+<body>
+  	
+   <table id="dg"  class="easyui-datagrid"  fit="true"
+            toolbar="#toolbar" pagination="true"
+            rownumbers="true" fitColumns="true" singleSelect="false" >
+        <thead>
+            <tr>
+            	<th field=""  data-options="checkbox:true"></th>
+                <th field="username"  width="50">账号</th>
+            </tr>
+        </thead>
+    </table>
+    <div id="toolbar" >
+    	<form id="searchFrom" action="">
+			账号:<input type="text" name="username" class="easyui-validatebox" />
+			<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" plain="true" onclick="cx()">查询</a><br>
+		</form>
+			<a id="add" href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="add()">新增</a>
+        	<a id="update" href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="upd()">编辑</a>
+        	<a id="delete" href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="del()">删除</a>
+    </div>
+</body>
+</html>

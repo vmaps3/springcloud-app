@@ -19,7 +19,7 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
         http
             .authorizeRequests()
 
-                .antMatchers( "/html/**","/api/**","/hystrix.stream").permitAll()
+                .antMatchers( "/html/**","/api/**","/hystrix.stream","/actuator/health").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .headers().frameOptions().disable();

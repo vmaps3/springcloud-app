@@ -7,7 +7,7 @@
 //var htmlURL = "/html";
 
 //springcloud-app
-var url = "/springcloud-app-system/springcloud-app-system";
+var url = "/springcloud-app-system";
 var htmlURL = "/html";
 
 

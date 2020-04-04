@@ -1,13 +1,8 @@
-# springcloud-app
+# springcloud-rbac
 
 ## 系统介绍
 
-- springcloud-app 是J2EE集群分布式基础开发平台，技术栈包括：springcloud，eureka，zuul，ribbon，feign，config，bus、hystrix，turbine，zipkin，MyBatis、springsecurity-oauth、redis，swagger，lombok，业务模块包括：用户管理，角色管理、权限管理，字典管理。
-## 核心流程概要
-
-- 用户->nginx->HTML->ZUUL(路由中心)->eureka(注册中心)->认证服务->资源服务->->REDIS/MYSQL
-- 外部通信,方式HTTP,协议HTTP,权限SHIRO,注意ZUUL过滤器屏蔽内部接口（防止内部接口对外暴露）
-- 内部通信,方式Feign,协议HTTP,权限eureka账号密码,注意springsecurity要开放内部接口
+- spring-cloud-rbac 是以spring-cloud为核心的权限管理框架，技术栈包括：spring-cloud,consul，gateway,hystrix，turbine，zipkin，mybatis、spring-security、redis，业务模块包括：用户管理，角色管理、权限管理，字典管理。
 
 ## 业务功能
 
@@ -19,33 +14,24 @@
 ## 技术栈
 
 - springcloud 整合
-- eureka 注册中心
-- zuul 路由中心
-- ribbon 通信
-- feign 注解通信
-- config 配置中心
-- bus 实时配置中心功能
-- hystrix 断路器监控
+- consul 注册中心
+- gateway 路由中心
 - turbine 断路器监控聚合
 - zipkin 链路监控
 - springBoot ioc，aop
 - mybatis ORM  
-- springsecurity-oauth 会话
+- springsecurity 会话
 - redis 缓存
-- 连接池 druid
-- swagger api
-- lombok 代码优化
-
 
 ## 部署
 
 - 1.导入数据库脚本springcloud.sql
 - 2.启动redis
-- 3.启动注册中心springcloud-app-eureka
+- 3.启动consul
 - 4.启动配置中心springcloud-app-config
 - 5.启动权限中心springcloud-app-system
 - 6.启动调度中心springcloud-app-schedule
-- 7.启动网关中心springcloud-app-zuul
+- 7.启动网关中心springcloud-app-gateway
 - 8.访问端口http://127.0.0.1:1101/html/login.html
 
 ## qq交流群

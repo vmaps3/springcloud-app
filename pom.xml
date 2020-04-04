@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.5.4.RELEASE</version>
+        <version>2.2.5.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.wangsong</groupId>
@@ -15,9 +15,8 @@
     <modules>
         <module>springcloud-app-common</module>
         <module>springcloud-app-system</module>
-        <module>springcloud-app-eureka</module>
         <module>springcloud-app-config</module>
-        <module>springcloud-app-zuul</module>
+        <module>springcloud-app-gateway</module>
         <module>springcloud-app-system-api</module>
         <module>springcloud-app-schedule</module>
         <module>springcloud-app-hystrix</module>
@@ -49,7 +48,7 @@
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
-                <version>Dalston.SR1</version>
+                <version>Hoxton.SR3</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -77,12 +76,12 @@
             <dependency>
                 <groupId>org.mybatis.spring.boot</groupId>
                 <artifactId>mybatis-spring-boot-starter</artifactId>
-                <version>1.1.1</version>
+                <version>2.1.2</version>
             </dependency>
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid-spring-boot-starter</artifactId>
-                <version>1.1.10</version>
+                <version>1.1.21</version>
             </dependency>
 
             <dependency>
@@ -99,7 +98,7 @@
             <dependency>
                 <groupId>com.github.pagehelper</groupId>
                 <artifactId>pagehelper-spring-boot-starter</artifactId>
-                <version>1.2.2</version>
+                <version>1.2.13</version>
             </dependency>
 
             <dependency>
@@ -123,6 +122,23 @@
                 <artifactId>commons-collections4</artifactId>
                 <version>4.1</version>
             </dependency>
+
+            <dependency>
+                <groupId>io.zipkin.java</groupId>
+                <artifactId>zipkin-server</artifactId>
+                <version>2.12.2</version>
+            </dependency>
+            <dependency>
+                <groupId>io.zipkin.java</groupId>
+                <artifactId>zipkin-autoconfigure-ui</artifactId>
+                <version>2.12.2</version>
+            </dependency>
+            <dependency>
+                <groupId>io.zipkin.java</groupId>
+                <artifactId>zipkin-autoconfigure-storage-mysql</artifactId>
+                <version>2.12.2</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 

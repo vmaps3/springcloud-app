@@ -21,7 +21,6 @@
         <module>schedule</module>
         <module>hystrix-dashboard</module>
         <module>turbine</module>
-        <module>zipkin</module>
     </modules>
     <!-- 设定主仓库，按设定顺序进行查找。 -->
     <repositories>
@@ -123,21 +122,8 @@
                 <version>4.1</version>
             </dependency>
 
-            <dependency>
-                <groupId>io.zipkin.java</groupId>
-                <artifactId>zipkin-server</artifactId>
-                <version>2.12.2</version>
-            </dependency>
-            <dependency>
-                <groupId>io.zipkin.java</groupId>
-                <artifactId>zipkin-autoconfigure-ui</artifactId>
-                <version>2.12.2</version>
-            </dependency>
-            <dependency>
-                <groupId>io.zipkin.java</groupId>
-                <artifactId>zipkin-autoconfigure-storage-mysql</artifactId>
-                <version>2.12.2</version>
-            </dependency>
+
+
 
         </dependencies>
     </dependencyManagement>

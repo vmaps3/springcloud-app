@@ -36,11 +36,11 @@ function del(){
 function cx(){
 	var obj=$("#searchFrom").serializeObject(); 
 	$.ajax({
-             url:"/schedule/schedule/schedule/list1",
+             url:url+"/system/dict/list",
              data:obj,
              type:'post',
              success:function(data){
-                	alert(data)
+                	$('#dg').datagrid('loadData',data.data);
              }
         });
 }

@@ -13,15 +13,15 @@
     <packaging>pom</packaging>
     <url>http://maven.apache.org</url>
     <modules>
-        <module>springcloud-app-common</module>
-        <module>springcloud-app-system</module>
-        <module>springcloud-app-config</module>
-        <module>springcloud-app-gateway</module>
-        <module>springcloud-app-system-api</module>
-        <module>springcloud-app-schedule</module>
-        <module>springcloud-app-hystrix</module>
-        <module>springcloud-app-turbine</module>
-        <module>springcloud-app-zipkin</module>
+        <module>common</module>
+        <module>system</module>
+        <module>config</module>
+        <module>gateway</module>
+        <module>system-api</module>
+        <module>schedule</module>
+        <module>hystrix-dashboard</module>
+        <module>turbine</module>
+        <module>zipkin</module>
     </modules>
     <!-- 设定主仓库，按设定顺序进行查找。 -->
     <repositories>
@@ -54,12 +54,12 @@
             </dependency>
             <dependency>
                 <groupId>com.wangsong</groupId>
-                <artifactId>springcloud-app-system-api</artifactId>
+                <artifactId>system-api</artifactId>
                 <version>0.0.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.wangsong</groupId>
-                <artifactId>springcloud-app-common</artifactId>
+                <artifactId>common</artifactId>
                 <version>0.0.1-SNAPSHOT</version>
             </dependency>
             <dependency>

@@ -12,6 +12,8 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
@@ -22,9 +24,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 @RequestMapping("/system/dict")
 @Api(value = "字典管理")
+@RefreshScope
 public class DictController extends BaseController {
     @Autowired
     private DictService dictService;
+    @Value("${spring.sleuth.sampler.percentage}")
+    private String port;
 
     @HystrixCommand(fallbackMethod = "test")
     @ApiOperation(value = "列表", httpMethod = "POST")
@@ -32,6 +37,7 @@ public class DictController extends BaseController {
     @RequestMapping(value = "/list")
     @ResponseBody
     public Result list(@ModelAttribute DictPage dict) {
+        System.out.println(port);
         return new Result(CodeEnum.SUCCESS.getCode(), dictService.findTByPage(dict));
     }
 

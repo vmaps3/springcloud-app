@@ -12,16 +12,14 @@
 			$.cookie('token', '', { expires: -1 });
 			if($("#ff").form('validate')==true){
 				$.ajax({   
-				     url:url+"/oauth/token",
+				     url:url+"/login",
 				     type:$("#ff").attr("method"),   
 				     data:$("#ff").serializeArray(),
-				     success:function(data){   
-				    	 if(data.scope=="success"){
-				    	 	$.cookie('token', "Bearer "+data.access_token);
-				        	window.location=htmlURL+"/index.html";
-				        }else{
-				        	$.messager.alert('提示',data.msg);
-				        }
+						success: function(data, textStatus, jqXHR) {
+
+							 $.cookie('token', "Bearer "+jqXHR.getResponseHeader("Authorization"));
+							 window.location=htmlURL+"/index.html";
+
 				     }
 				});
 			}
@@ -40,9 +38,7 @@
 		<form id="ff" style="padding:10px 20px 10px 40px;"  method="post">
 			<p>账号: <input type="text" name="username" value="wangsong" class="easyui-textbox" required="true"></p>
 			<p>密码: <input type="password"  name="password" value="wangsong" class="easyui-textbox" required="true"></p>
-			<input type="hidden"  name="grant_type" value="password">
-			<input type="hidden"  name="client_id" value="client">
-			<input type="hidden"  name="client_secret" value="">
+
 			<div style="padding:5px;text-align:center;">
 				
 				<a href="javascript:void(0)" class="easyui-linkbutton" onclick="submitForm()">提交</a>

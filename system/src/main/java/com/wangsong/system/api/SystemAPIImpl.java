@@ -9,6 +9,7 @@ import com.wangsong.system.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,8 +32,9 @@ public class SystemAPIImpl extends BaseController {
     @ApiOperation(value = "获取用户", httpMethod = "POST")
     @RequestMapping(value = "/getUser", method = RequestMethod.POST)
     @ResponseBody
-    public Result<UserDO> getUser(@RequestBody UserDO u) {
-        return new Result(CodeEnum.SUCCESS.getCode(), u);
+    public Result<UserDetails> getUser(String user) {
+        UserDetails userDetails = userService.loadUserByUsername(user);
+        return new Result("",userDetails);
     }
 
 

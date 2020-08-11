@@ -5,14 +5,15 @@ import com.wangsong.common.model.CodeEnum;
 import com.wangsong.common.model.Result;
 import com.wangsong.system.model.User;
 import com.wangsong.system.model.UserAddModel;
-import com.wangsong.system.model.UserDO;
 import com.wangsong.system.model.UserPage;
 import com.wangsong.system.service.UserService;
+import com.wangsong.system.vo.UserVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,6 +22,8 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Api(value = "用户管理")
 @Controller
@@ -49,7 +52,7 @@ public class UserController extends BaseController {
 
     @ApiOperation(value = "单条", httpMethod = "POST")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "id", paramType = "form"),
+        @ApiImplicitParam(name = "id", value = "id", paramType = "form"),
     })
     @RequestMapping(value = "/selectByPrimaryKey")
     @ResponseBody
@@ -70,7 +73,7 @@ public class UserController extends BaseController {
 
     @ApiOperation(value = "删除", httpMethod = "POST")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "id", paramType = "form"),
+        @ApiImplicitParam(name = "id", value = "id", paramType = "form"),
     })
     @PreAuthorize("hasAuthority('/system/user/delete')")
     @RequestMapping(value = "/delete")
@@ -95,11 +98,12 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/toUpdatePassword")
     @ResponseBody
     public Result toUpdatePassword() {
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext()
-                .getAuthentication()
-                .getPrincipal();
-        String id= ((UserDO)userDetails).getId();
-        return new Result(CodeEnum.SUCCESS.getCode(),userService.selectByPrimaryKey(id));
+        String userDetails = (String) SecurityContextHolder.getContext()
+            .getAuthentication()
+            .getPrincipal();
+        User u=new User();
+        u.setUsername(userDetails);
+        return new Result(CodeEnum.SUCCESS.getCode(),userService.findTByT(u));
     }
 
     @ApiOperation(value = "更改密码", httpMethod = "POST")

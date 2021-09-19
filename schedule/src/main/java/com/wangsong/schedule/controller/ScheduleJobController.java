@@ -44,9 +44,7 @@ public class ScheduleJobController {
     @RequestMapping("/add")
     @ResponseBody
     public Object add(String text) {
-        UserDO userDO=new UserDO();
-        userDO.setUsername(text);
-        return client.getUser(userDO);
+        return client.getUser(text);
     }
 
     @HystrixCommand(fallbackMethod = "test")

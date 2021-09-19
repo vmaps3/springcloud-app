@@ -1,39 +1,42 @@
 package com.wangsong.system.controller;
 
 
-import com.wangsong.common.controller.BaseController;
 import com.wangsong.common.model.CodeEnum;
 import com.wangsong.common.model.Result;
-import com.wangsong.system.model.Resources;
-import com.wangsong.system.model.User;
-import com.wangsong.system.service.ResourcesService;
-import com.wangsong.system.service.UserService;
+import com.wangsong.system.entity.Resources;
+import com.wangsong.system.service.IResourcesService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+import com.wangsong.common.controller.BaseController;
+
+/**
+ * <p>
+ *  前端控制器
+ * </p>
+ *
+ * @author jobob
+ * @since 2021-09-19
+ */
 @Api(value = "权限管理")
-@Controller
+@RestController
 @RequestMapping("/system/resources")
 public class ResourcesController extends BaseController {
     @Autowired
-    private ResourcesService resourcesService;
-    @Autowired
-    private UserService userService;
+    private IResourcesService resourcesService;
+
     @ApiOperation(value = "增加", httpMethod = "POST")
     @PreAuthorize("hasAuthority('/system/resources/add')")
     @RequestMapping(value = "/add")
-    @ResponseBody
     public Result add(@ModelAttribute Resources resources) {
         resourcesService.insertResources(resources);
         return new Result(CodeEnum.SUCCESS.getCode(), null);
@@ -41,12 +44,12 @@ public class ResourcesController extends BaseController {
 
     @ApiOperation(value = "删除", httpMethod = "POST")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "id", paramType = "form"),
+            @ApiImplicitParam(name = "id", value = "id", paramType = "form"),
     })
     @PreAuthorize("hasAuthority('/system/resources/delete')")
     @RequestMapping(value = "/delete")
     @ResponseBody
-    public Result delete(String[] id) {
+    public Result delete(Long[] id) {
         resourcesService.deleteResources(id);
         return new Result(CodeEnum.SUCCESS.getCode(), null);
     }
@@ -75,22 +78,18 @@ public class ResourcesController extends BaseController {
     @ResponseBody
     public Result findResourcesEMUByResources() {
         String userDetails = (String) SecurityContextHolder.getContext()
-            .getAuthentication()
-            .getPrincipal();
-        User u=new User();
-        u.setUsername(userDetails);
-        User tByT = userService.findTByT(u);
-        return new Result(CodeEnum.SUCCESS.getCode(), resourcesService.findResourcesEMUByResources(tByT.getId()));
+                .getAuthentication()
+                .getPrincipal();
+        return new Result(CodeEnum.SUCCESS.getCode(), resourcesService.findResourcesEMUByResources(userDetails));
     }
 
     @ApiOperation(value = "单条", httpMethod = "POST")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "id", paramType = "form"),
+            @ApiImplicitParam(name = "id", value = "id", paramType = "form"),
     })
     @RequestMapping(value = "/selectByPrimaryKey")
     @ResponseBody
-    public Result selectByPrimaryKey(String id) {
+    public Result selectByPrimaryKey(Long id) {
         return new Result(CodeEnum.SUCCESS.getCode(), resourcesService.selectByPrimaryKey(id));
     }
-
 }

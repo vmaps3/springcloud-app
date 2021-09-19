@@ -19,7 +19,7 @@ public class ResourcesDO implements Serializable , GrantedAuthority {
 
 
     @ApiModelProperty(value = "id")
-    private String id;
+    private Long id;
     @ApiModelProperty(value = "父id")
     private String pid;
     @ApiModelProperty(value = "名称")

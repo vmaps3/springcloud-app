@@ -26,23 +26,27 @@
 			}
 			
 			$(function(){
-			$.ajax({
-             url:url+"/system/dict/findDictByDict?type=1",
-             type:'get',
-             success:function(data){
-                	$('#cc').combobox('loadData',data.data);
-                		$.ajax({
-							 url:url+'/system/resources/selectByPrimaryKey',
-							 type:'post',
-							 data:'id='+getQueryString("id"),
-							 success:function(data){
-								 $('#ff').form('load',data.data);
-								 $('#cc').combobox('setValue',data.data.type);
-							 }
-						});
-             }
-
+$('#cc').combobox({
+    data:[{
+		"id":1,
+		"text":"菜单"
+	},{
+		"id":2,
+		"text":"按钮"
+	}],
+		valueField:'id',
+		textField:'text'
+	});
+				$.ajax({
+					 url:url+'/system/resources/selectByPrimaryKey',
+					 type:'post',
+					 data:'id='+getQueryString("id"),
+					 success:function(data){
+						 $('#ff').form('load',data.data);
+						 $('#cc').combobox('setValue',data.data.type);
+					 }
 				});
+
 			})
 		</script>
 	</head>
@@ -74,12 +78,10 @@
 						类型: 
 					</td>
 					<td>
-						<input id="cc" class="easyui-combobox" name="type" required="true"
-							data-options="
-								valueField:'code',
-								textField:'name',
-								panelHeight:'auto'
-							">
+						<input id="cc" class="easyui-combobox" name="type" required="true">
+
+
+						</input>
 					</td>
 				</tr>
 				<tr>

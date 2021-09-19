@@ -1,87 +1,110 @@
 package com.wangsong.system.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.wangsong.common.model.Attributes;
 import com.wangsong.common.model.JsonTreeData;
 import com.wangsong.common.util.TreeNodeUtil;
-import com.wangsong.system.dao.ResourcesMapper;
-import com.wangsong.system.model.Resources;
-import com.wangsong.system.model.RoleResources;
-import com.wangsong.system.service.ResourcesService;
-import com.wangsong.system.service.RoleService;
+import com.wangsong.system.entity.Resources;
+import com.wangsong.system.entity.RoleResources;
+import com.wangsong.system.entity.User;
+import com.wangsong.system.entity.UserRole;
+import com.wangsong.system.mapper.ResourcesMapper;
+import com.wangsong.system.service.IResourcesService;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.wangsong.system.service.IRoleResourcesService;
+import com.wangsong.system.service.IUserRoleService;
+import com.wangsong.system.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-
+/**
+ * <p>
+ * 服务实现类
+ * </p>
+ *
+ * @author jobob
+ * @since 2021-09-19
+ */
 @Service
-public class ResourcesServiceImpl implements ResourcesService {
+public class ResourcesServiceImpl extends ServiceImpl<ResourcesMapper, Resources> implements IResourcesService {
     @Autowired
-    private ResourcesMapper resourcesMapper;
+    private IRoleResourcesService roleResourcesService;
     @Autowired
-    private RoleService roleService;
+    private IUserService  userService;
 
+    @Autowired
+    private IUserRoleService userRoleService;
     @Override
     @Transactional
-    public void deleteResources(String[] id) {
-        int j = 0;
-        for (int i = 0; i < id.length; i++) {
-            if ("1".equals(id[i])) {
+    public void deleteResources(Long[] ids) {
+        for (Long id : ids) {
+            if ("1".equals(id)) {
                 continue;
             }
-            j++;
+            removeById(id);
+            UpdateWrapper updateWrapper = new UpdateWrapper();
+            updateWrapper.eq("resources_id", id);
+            roleResourcesService.remove(updateWrapper);
         }
-        RoleResources[] r = new RoleResources[j];
-        for (int i = 0; i < id.length; i++) {
-            if ("1".equals(id[i])) {
-                continue;
-            }
-            r[i] = new RoleResources(null, id[i], null);
-        }
-        if (j == 0) {
-            return;
-        }
-        roleService.deleteByT(r);
-        resourcesMapper.deleteBy(id);
     }
 
     @Override
-    @Transactional
     public void insertResources(Resources resources) {
         if ("".equals(resources.getUrl())) {
             resources.setUrl("/");
         }
-        resources.setId(UUID.randomUUID().toString());
-        resourcesMapper.insert(resources);
-    }
-
-    @Override
-    @Transactional
-    public void updateResources(Resources resources) {
-        if ("".equals(resources.getUrl())) {
-            resources.setUrl("/");
-        }
-        resourcesMapper.updateByPrimaryKey(resources);
+        save(resources);
     }
 
     @Override
     public List<JsonTreeData> findResources() {
-        List<Resources> resourcesList = resourcesMapper.selectAll();
+        List<Resources> resourcesList = list();
         return resourcesToJsonTreeData(resourcesList);
     }
 
     @Override
-    public List<Resources> findResourcesEMUByResources(String id) {
-        return findTByT(new Resources(id, null, null, null, null, null));
+    public List<Resources> findResourcesEMUByResources(String username) {
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.eq("username",username);
+        User user = userService.getOne(queryWrapper);
+        QueryWrapper queryWrapper2 = new QueryWrapper();
+        queryWrapper2.eq("user_id", user.getId());
+        List<UserRole> userRoleList = userRoleService.list(queryWrapper2);
+        List<Long> roleIds = new ArrayList<>();
+        for (UserRole userRole : userRoleList) {
+            roleIds.add(userRole.getRoleId());
+        }
+        QueryWrapper queryWrapper3 = new QueryWrapper();
+        queryWrapper3.in("role_id", roleIds);
+        List<RoleResources> roleResourcesList = roleResourcesService.list(queryWrapper3);
+        List<Long> roleResourcesLists = new ArrayList<>();
+
+        for (RoleResources roleResources : roleResourcesList) {
+            roleResourcesLists.add(roleResources.getResourcesId());
+        }
+        QueryWrapper queryWrapper4 = new QueryWrapper();
+        queryWrapper4.in("id", roleResourcesLists);
+        queryWrapper4.orderByAsc("sort");
+        List<Resources> resourcesList = list(queryWrapper4);
+        return resourcesList;
     }
 
     @Override
-    public List<Resources> findTByT(Resources resources) {
-        List<Resources> resourcesList = roleService.findResourcesByT(resources);
-        return resourcesList;
+    public void updateResources(Resources resources) {
+        if ("".equals(resources.getUrl())) {
+            resources.setUrl("/");
+        }
+        updateById(resources);
+    }
+
+    @Override
+    public Resources selectByPrimaryKey(Long id) {
+        return getById(id);
     }
 
     private List<JsonTreeData> resourcesToJsonTreeData(List<Resources> resourcesList) {
@@ -101,11 +124,4 @@ public class ResourcesServiceImpl implements ResourcesService {
         List<JsonTreeData> newTreeDataList = TreeNodeUtil.getfatherNode(treeDataList);
         return newTreeDataList;
     }
-
-    @Override
-    public Resources selectByPrimaryKey(String id) {
-        return resourcesMapper.selectByPrimaryKey(id);
-    }
-
-
 }

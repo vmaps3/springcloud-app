@@ -2,7 +2,7 @@ package com.wangsong.config;
 
 
 import com.wangsong.system.model.CustomUserDetails;
-import com.wangsong.system.service.UserService;
+import com.wangsong.system.service.IUserService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,12 +30,12 @@ import java.util.Date;
 public class JWTLoginFilter extends UsernamePasswordAuthenticationFilter {
 
   private AuthenticationManager authenticationManager;
-  private UserService userService;
+  private IUserService userService;
   public JWTLoginFilter(AuthenticationManager authenticationManager) {
     this.authenticationManager = authenticationManager;
   }
 
-  public JWTLoginFilter(AuthenticationManager authenticationManager, UserService userService) {
+  public JWTLoginFilter(AuthenticationManager authenticationManager, IUserService userService) {
     this.authenticationManager = authenticationManager;
     this.userService = userService;
   }

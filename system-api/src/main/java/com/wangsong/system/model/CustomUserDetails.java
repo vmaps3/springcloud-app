@@ -1,13 +1,11 @@
 package com.wangsong.system.model;
 
+import cn.hutool.core.util.StrUtil;
 import lombok.Getter;
 import lombok.ToString;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -18,7 +16,7 @@ import java.util.Set;
  */
 @Getter
 @ToString
-public class CustomUserDetails extends UserDO implements UserDetails , Serializable {
+public class CustomUserDetails extends UserDO implements UserDetails {
 
     private static final long serialVersionUID = 1702923242319850756L;
 
@@ -30,8 +28,8 @@ public class CustomUserDetails extends UserDO implements UserDetails , Serializa
 
     public CustomUserDetails(UserDO user, boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
         if (user != null
-                && !StringUtils.isBlank(user.getUsername())
-                && !StringUtils.isBlank(user.getPassword())) {
+                && StrUtil.isNotBlank(user.getUsername())
+                && StrUtil.isNotBlank(user.getPassword())) {
             setId(user.getId());
             setUsername(user.getUsername());
             setPassword(user.getPassword());
@@ -39,7 +37,8 @@ public class CustomUserDetails extends UserDO implements UserDetails , Serializa
             this.accountNonExpired = accountNonExpired;
             this.credentialsNonExpired = credentialsNonExpired;
             this.accountNonLocked = accountNonLocked;
-            this.authorities = Collections.unmodifiableSet(new HashSet<>(CollectionUtils.emptyIfNull(authorities)));
+            this.authorities = Collections.unmodifiableSet(new HashSet<>(
+                    null == authorities ? Collections.emptyList() : authorities));
         } else {
             throw new IllegalArgumentException("Cannot pass null or empty values to constructor");
         }

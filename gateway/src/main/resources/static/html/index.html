@@ -20,28 +20,23 @@
 
 		$(function(){
 			var json=[{"text": "菜单","children":[]}];
-            var j=0
 			if(getResources("/system")){
 			    var system={"text": "系统管理","children":[]};
-			    var i=0
                 if(getResources("/system/user")){
-                    system.children[i]={"text": "用户管理","attributes": {"url": "/system/user/list.html"}};
-                    i+=1;
+                    system.children.push({"text": "用户管理","attributes": {"url": "/system/user/list.html"}});
+                 
                 }
                 if(getResources("/system/role")){
-                     system.children[i]={"text": "角色管理","attributes": {"url": "/system/role/list.html"}};
-                     i+=1;
+                     system.children.push({"text": "角色管理","attributes": {"url": "/system/role/list.html"}});
+                   
                 }
                 if(getResources("/system/resources")){
-                    system.children[i]={"text": "权限管理","attributes": {"url": "/system/resources/list.html"}};
-                    i+=1;
+                    system.children.push({"text": "权限管理","attributes": {"url": "/system/resources/list.html"}});
+                 
                 }
-                if(getResources("/system/dict")){
-                    system.children[i]={"text": "字典管理","attributes": {"url": "/system/dict/list.html"}};
-                    i+=1;
-                }
-                json[0].children[j]=system;
-                j+=1
+
+                json[0].children.push(system);
+              
 			}
             $('#tree').tree({
 				data: json,
@@ -68,23 +63,6 @@
 		function edit(){
 			 addTab("更改密码", htmlURL+"/system/user/updatePassword.html");
 		}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     </script>
 </head>
 

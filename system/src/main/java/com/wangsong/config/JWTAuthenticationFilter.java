@@ -1,7 +1,7 @@
 package com.wangsong.config;
 
 
-import com.wangsong.system.service.UserService;
+import com.wangsong.system.service.IUserService;
 import io.jsonwebtoken.Jwts;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,12 +23,12 @@ import java.io.IOException;
  * @author zhaoxinguo on 2017/9/13.
  */
 public class JWTAuthenticationFilter extends BasicAuthenticationFilter {
-  private UserService userService;
+  private IUserService userService;
   public JWTAuthenticationFilter(AuthenticationManager authenticationManager) {
     super(authenticationManager);
   }
 
-  public JWTAuthenticationFilter(AuthenticationManager authenticationManager, UserService userService) {
+  public JWTAuthenticationFilter(AuthenticationManager authenticationManager, IUserService userService) {
     super(authenticationManager);
     this.userService=userService;
   }

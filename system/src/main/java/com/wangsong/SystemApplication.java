@@ -21,7 +21,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableFeignClients
 @EnableDiscoveryClient
 @SpringBootApplication
-@MapperScan("com.wangsong.*.dao")
+@MapperScan("com.wangsong.*.mapper")
 public class SystemApplication {
 
 	public static void main(String[] args) {

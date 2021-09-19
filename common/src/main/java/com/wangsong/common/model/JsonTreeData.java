@@ -11,8 +11,8 @@ import java.util.List;
 @AllArgsConstructor
 public class JsonTreeData {
 
-    public String id;       //json id
-    public String pid;      //
+    public Long id;       //json id
+    public Long pid;      //
     public String text;     //json 显示文本
     public String state;    //json 'open','closed'
     public Attributes attributes;

@@ -1,102 +1,117 @@
 package com.wangsong.system.service.impl;
 
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.wangsong.common.model.CodeEnum;
 import com.wangsong.common.model.GetEasyUIData;
-import com.wangsong.system.dao.RoleMapper;
-import com.wangsong.system.dao.RoleResourcesMapper;
-import com.wangsong.system.model.*;
-import com.wangsong.system.service.RoleService;
-import com.wangsong.system.service.UserService;
+import com.wangsong.system.entity.Resources;
+import com.wangsong.system.entity.Role;
+import com.wangsong.system.entity.RoleResources;
+import com.wangsong.system.mapper.RoleMapper;
+import com.wangsong.system.service.IRoleResourcesService;
+import com.wangsong.system.service.IRoleService;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.wangsong.system.service.IUserRoleService;
+import com.wangsong.system.service.IUserService;
+import com.wangsong.system.vo.RoleAddModel;
+import com.wangsong.system.vo.RolePage;
 import com.wangsong.system.vo.RoleVO;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import java.util.List;
-import java.util.UUID;
 
-
+/**
+ * <p>
+ * 服务实现类
+ * </p>
+ *
+ * @author jobob
+ * @since 2021-09-19
+ */
 @Service
-public class RoleServiceImpl implements RoleService {
+public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IRoleService {
     @Autowired
-    private RoleMapper roleMapper;
+    private IRoleResourcesService roleResourcesService;
     @Autowired
-    private UserService userService;
-    @Autowired
-    private RoleResourcesMapper roleResourcesMapper;
-
+    private IUserRoleService userRoleService;
 
     @Override
     @Transactional
     public void insertRole(RoleAddModel role) {
-        String[] resourcesId = role.getResourcesId();
-        role.setId(UUID.randomUUID().toString());
-        roleMapper.insert(role);
-        if (resourcesId == null) {
+        Long[] resourcesIds = role.getResourcesId();
+        save(role);
+        if (resourcesIds == null) {
             return;
         }
-        for (int i = 0; i < resourcesId.length; i++) {
-            roleResourcesMapper.insert(new RoleResources(UUID.randomUUID().toString()
-                    , resourcesId[i], role.getId()));
+        for (Long resourcesId : resourcesIds) {
+            RoleResources roleResources = new RoleResources();
+            roleResources.setResourcesId(resourcesId);
+            roleResources.setRoleId(role.getId());
+            roleResourcesService.save(roleResources);
         }
     }
 
     @Override
     @Transactional
     public void updateRole(RoleAddModel role) {
-        String[] resourcesId = role.getResourcesId();
-        roleResourcesMapper.deleteByT(new RoleResources[]{new RoleResources(null, null, role.getId())});
-        roleMapper.updateByPrimaryKey(role);
-        if (resourcesId == null) {
+        Assert.notNull(role.getId(), CodeEnum.NO_NULL.getCode());
+        Long[] resourcesIds = role.getResourcesId();
+        updateById(role);
+
+        UpdateWrapper updateWrapper = new UpdateWrapper();
+        updateWrapper.eq("role_id", role.getId());
+        roleResourcesService.remove(updateWrapper);
+        if (resourcesIds == null) {
             return;
         }
-        for (int i = 0; i < resourcesId.length; i++) {
-            roleResourcesMapper.insert(new RoleResources(UUID.randomUUID().toString(), resourcesId[i], role.getId()));
+        for (Long resourcesId : resourcesIds) {
+            RoleResources roleResources = new RoleResources();
+            roleResources.setResourcesId(resourcesId);
+            roleResources.setRoleId(role.getId());
+            roleResourcesService.save(roleResources);
         }
     }
 
     @Override
-    @Transactional
-    public void deleteRole(String[] id) {
-        RoleResources[] r = new RoleResources[id.length];
-        UserRole[] u = new UserRole[id.length];
-        for (int i = 0; i < id.length; i++) {
-            r[i] = new RoleResources(null, null, id[i]);
-            u[i] = new UserRole(null, null, id[i]);
-        }
-
-        userService.deleteByT(u);
-        roleResourcesMapper.deleteByT(r);
-        roleMapper.deleteBy(id);
+    public void deleteRole(Long[] id) {
+        UpdateWrapper updateWrapper = new UpdateWrapper();
+        updateWrapper.in("role_id", id);
+        userRoleService.remove(updateWrapper);
+        roleResourcesService.remove(updateWrapper);
+        removeByIds(ListUtil.toList(id));
     }
 
     @Override
     public GetEasyUIData findTByPage(RolePage role) {
-        Page<Object> objects = PageHelper.startPage(role.getPage(), role.getRows());
-        return new GetEasyUIData(roleMapper.findTByPage(role)
-                , objects.getTotal());
+        IPage<Role> page = new Page<>(role.getPage(), role.getRows());
+        QueryWrapper queryWrapper = new QueryWrapper();
+        if (StrUtil.isNotBlank(role.getName())) {
+            queryWrapper.eq("name", role.getName());
+        }
+        IPage<Role> page1 = page(page, queryWrapper);
+        return new GetEasyUIData(page1.getRecords(), page1.getTotal());
+
     }
 
     @Override
-    public RoleVO selectByPrimaryKey(String id) {
-        RoleVO role = roleMapper.selectRoleVOByPrimaryKey(id);
-        role.setRoleResourcesList(roleResourcesMapper.findTByT(new RoleResources(null, null, id)));
-        return role;
+    public RoleVO selectByPrimaryKey(Long id) {
+        Role role = getById(id);
+        RoleVO roleVO = new RoleVO();
+        BeanUtils.copyProperties(role, roleVO);
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.eq("role_id", id);
+        List<RoleResources> roleResourcesList = roleResourcesService.list(queryWrapper);
+        roleVO.setRoleResourcesList(roleResourcesList);
+        return roleVO;
     }
 
-    @Override
-    public List<Role> selectAll() {
-        return roleMapper.selectAll();
-    }
 
-    @Override
-    public void deleteByT(RoleResources[] r) {
-        roleResourcesMapper.deleteByT(r);
-    }
-
-    @Override
-    public List<Resources> findResourcesByT(Resources resources) {
-        return roleResourcesMapper.findResourcesByT(resources);
-    }
 }

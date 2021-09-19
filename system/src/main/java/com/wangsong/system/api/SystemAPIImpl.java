@@ -4,8 +4,8 @@ import com.wangsong.common.controller.BaseController;
 import com.wangsong.common.model.CodeEnum;
 import com.wangsong.common.model.Result;
 import com.wangsong.system.model.UserDO;
-import com.wangsong.system.service.ResourcesService;
-import com.wangsong.system.service.UserService;
+import com.wangsong.system.service.IResourcesService;
+import com.wangsong.system.service.IUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +24,10 @@ public class SystemAPIImpl extends BaseController {
 
 
     @Autowired
-    private UserService userService;
+    private IUserService userService;
 
     @Autowired
-    private ResourcesService resourcesService;
+    private IResourcesService resourcesService;
 
     @ApiOperation(value = "获取用户", httpMethod = "POST")
     @RequestMapping(value = "/getUser", method = RequestMethod.POST)

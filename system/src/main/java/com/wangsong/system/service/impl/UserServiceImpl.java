@@ -1,148 +1,198 @@
 package com.wangsong.system.service.impl;
 
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.digest.DigestUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.wangsong.common.model.CodeEnum;
 import com.wangsong.common.model.GetEasyUIData;
-import com.wangsong.system.dao.UserMapper;
-import com.wangsong.system.dao.UserRoleMapper;
-import com.wangsong.system.model.*;
-import com.wangsong.system.service.ResourcesService;
-import com.wangsong.system.service.UserService;
+import com.wangsong.system.entity.*;
+import com.wangsong.system.mapper.UserMapper;
+import com.wangsong.system.mapper.UserRoleMapper;
+import com.wangsong.system.model.CustomUserDetails;
+import com.wangsong.system.model.UserDO;
+import com.wangsong.system.service.IResourcesService;
+import com.wangsong.system.service.IRoleResourcesService;
+import com.wangsong.system.service.IUserRoleService;
+import com.wangsong.system.service.IUserService;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.wangsong.system.vo.UserAddModel;
+import com.wangsong.system.vo.UserPage;
 import com.wangsong.system.vo.UserVO;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
+/**
+ * <p>
+ * 服务实现类
+ * </p>
+ *
+ * @author jobob
+ * @since 2021-09-19
+ */
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
     @Autowired
-    private UserMapper userMapper;
+    private IUserRoleService userRoleMapper;
+    @Autowired
+    private IResourcesService resourcesService;
+    @Autowired
+    private IRoleResourcesService roleResourcesService;
 
-    @Autowired
-    private UserRoleMapper userRoleMapper;
-
-    @Autowired
-    private ResourcesService resourcesService;
+    @Override
+    public GetEasyUIData list(UserPage user) {
+        IPage<User> page = new Page<>(user.getPage(), user.getRows());
+        QueryWrapper queryWrapper = new QueryWrapper();
+        if (StrUtil.isNotBlank(user.getUsername())) {
+            queryWrapper.eq("username", user.getUsername());
+        }
+        IPage<User> page1 = page(page, queryWrapper);
+        return new GetEasyUIData(page1.getRecords(), page1.getTotal());
+    }
 
     @Override
     @Transactional
-    public void insertUser(UserAddModel user) {
-        String[] roleId = user.getRoleId();
-        user.setPassword(DigestUtils.md5Hex(user.getPassword()));
-        user.setId(UUID.randomUUID().toString());
-        userMapper.insert(user);
-        if (roleId == null) {
+    public void add(UserAddModel user) {
+        Long[] roleIds = user.getRoleId();
+        user.setPassword(DigestUtil.md5Hex(user.getPassword()));
+        save(user);
+        if (roleIds == null) {
             return;
         }
-        for (int i = 0; i < roleId.length; i++) {
-            userRoleMapper.insert(new UserRole(UUID.randomUUID().toString()
-                    , user.getId(), roleId[i]));
+        for (Long roleId : roleIds) {
+            UserRole userRole = new UserRole();
+            userRole.setUserId(user.getId());
+            userRole.setRoleId(roleId);
+            userRoleMapper.save(userRole);
         }
     }
+
 
     @Override
     @Transactional
     public void updateUser(UserAddModel user) {
-        String[] roleId = user.getRoleId();
-        if (!"".equals(user.getPassword())) {
-            user.setPassword(DigestUtils.md5Hex(user.getPassword()));
-            userMapper.updateByPrimaryKey(user);
+        Assert.notNull(user.getId(), CodeEnum.NO_NULL.getCode());
+        Long[] roleIds = user.getRoleId();
+        if (StrUtil.isNotBlank(user.getPassword())) {
+            user.setPassword(DigestUtil.md5Hex(user.getPassword()));
+        } else {
+            user.setPassword(null);
         }
-        userMapper.updateNoPasswordByPrimaryKey(user);
+        updateById(user);
+        UpdateWrapper updateWrapper = new UpdateWrapper();
+        updateWrapper.eq("user_id", user.getId());
+        userRoleMapper.remove(updateWrapper);
 
-        userRoleMapper.deleteByT(new UserRole[]{new UserRole(null, user.getId(), null)});
 
-
-        if (roleId == null) {
+        if (roleIds == null) {
             return;
         }
-        for (int i = 0; i < roleId.length; i++) {
-            userRoleMapper.insert(new UserRole(UUID.randomUUID().toString()
-                    , user.getId(), roleId[i]));
+        for (Long roleId : roleIds) {
+            UserRole userRole = new UserRole();
+            userRole.setUserId(user.getId());
+            userRole.setRoleId(roleId);
+            userRoleMapper.save(userRole);
         }
     }
 
     @Override
     @Transactional
-    public void deleteUser(String[] id) {
-        UserRole[] u = new UserRole[id.length];
-        for (int i = 0; i < id.length; i++) {
-            u[i] = new UserRole(null, id[i], null);
+    public void deleteUser(Long[] id) {
+        for (Long ids : id) {
+            UpdateWrapper deleteWrapper = new UpdateWrapper();
+            deleteWrapper.eq("user_id", ids);
+            userRoleMapper.remove(deleteWrapper);
+            removeById(ids);
         }
-        userRoleMapper.deleteByT(u);
-        userMapper.deleteBy(id);
-
     }
 
-    @Override
-    public User selectByPrimaryKey(String id) {
-        User u = userMapper.selectByPrimaryKey(id);
-        u.setPassword("");
-        return u;
-    }
 
     @Override
     public void updatePassword(UserAddModel user) {
-        if (!"".equals(user.getPassword())) {
-            user.setPassword(DigestUtils.md5Hex(user.getPassword()));
-            userMapper.updateByPrimaryKey(user);
+        if (StrUtil.isNotBlank(user.getPassword())) {
+            user.setPassword(DigestUtil.md5Hex(user.getPassword()));
+        } else {
+            user.setPassword(null);
         }
-        userMapper.updateNoPasswordByPrimaryKey(user);
+        updateById(user);
     }
 
     @Override
-    public GetEasyUIData findTByPage(UserPage user) {
-        Page<Object> objects = PageHelper.startPage(user.getPage(), user.getRows());
-        return new GetEasyUIData(userMapper.findTByPage(user)
-                , objects.getTotal());
-    }
-
-
-    @Override
-    public UserVO selectVOByPrimaryKey(String id) {
-        UserVO u = userMapper.selectVOByPrimaryKey(id);
-        u.setPassword("");
-        u.setUserRoleList(userRoleMapper.findTByT(new UserRole(null, id, null)));
-        return u;
+    public String findTByT(User user) {
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.eq("username", user.getUsername());
+        User userOne = getOne(queryWrapper);
+        String r = userOne == null ? CodeEnum.SUCCESS.getCode() : CodeEnum.NO_NULL.getCode();
+        return r;
     }
 
     @Override
-    public User findTByT(User user) {
-        return userMapper.findTByT(user);
+    public User findTByUsername(String userDetails) {
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.eq("username", userDetails);
+        User userOne = getOne(queryWrapper);
+        return userOne;
     }
 
     @Override
-    public void deleteByT(UserRole[] u) {
-        userRoleMapper.deleteByT(u);
+    public UserDetails loadUserByUsername(String userDetails) throws UsernameNotFoundException {
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.eq("username", userDetails);
+        User user = getOne(queryWrapper);
 
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = findTByT(new User(null, username, null));
-        UserDO userDO=new UserDO();
-        BeanUtils.copyProperties(user,userDO);
         if (user == null) {
-            throw new UsernameNotFoundException("Could not find the user '" + username + "'");
+            throw new UsernameNotFoundException("Could not find the user '" + userDetails + "'");
         }
-        List<Resources> roleList = resourcesService.findTByT(new Resources(user.getId(), null, null, null, "2", null));
-        List<ResourcesDO> resourcesDOList=new ArrayList<ResourcesDO>();
-        for(int i=0;i<roleList.size();i++){
-            ResourcesDO resourcesDO=new ResourcesDO();
-            BeanUtils.copyProperties(roleList.get(i),resourcesDO);
-            resourcesDOList.add(resourcesDO);
+        QueryWrapper queryWrapper2 = new QueryWrapper();
+        queryWrapper2.eq("user_id", user.getId());
+        List<UserRole> userRoleList = userRoleMapper.list(queryWrapper2);
+        List<Long> roleIds = new ArrayList<>();
+        for (UserRole userRole : userRoleList) {
+            roleIds.add(userRole.getRoleId());
         }
+        QueryWrapper queryWrapper3 = new QueryWrapper();
+        queryWrapper3.in("role_id", roleIds);
+        List<RoleResources> roleResourcesList = roleResourcesService.list(queryWrapper3);
+        List<Long> roleResourcesLists = new ArrayList<>();
 
+        for (RoleResources roleResources : roleResourcesList) {
+            roleResourcesLists.add(roleResources.getResourcesId());
+        }
+        QueryWrapper queryWrapper4 = new QueryWrapper();
+        queryWrapper4.in("id", roleResourcesLists);
+        queryWrapper4.eq("type", 2);
+        queryWrapper4.orderByAsc("sort");
+        List<Resources> resourcesList = resourcesService.list(queryWrapper4);
 
+        UserDO userDO = new UserDO();
+        BeanUtils.copyProperties(user, userDO);
         // Not involve authorities, so pass null to authorities
-        return   new CustomUserDetails(userDO, true, true, true, true, resourcesDOList);
+        return new CustomUserDetails(userDO, true, true, true, true, resourcesList);
+
+    }
+
+
+    @Override
+    public UserVO selectVOByPrimaryKey(Long id) {
+        User u = getById(id);
+        u.setPassword("");
+        UserVO userVO = new UserVO();
+        BeanUtils.copyProperties(u, userVO);
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.eq("user_id", id);
+        List<UserRole> userRoleList = userRoleMapper.list(queryWrapper);
+        userVO.setUserRoleList(userRoleList);
+        return userVO;
+
     }
 }

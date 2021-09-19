@@ -1,7 +1,7 @@
 package com.wangsong.config;
 
 
-import com.wangsong.system.service.UserService;
+import com.wangsong.system.service.IUserService;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -19,10 +19,10 @@ import org.springframework.util.DigestUtils;
 @EnableGlobalMethodSecurity(prePostEnabled = true,securedEnabled =true)//激活方法上的PreAuthorize注解
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-  private UserService userService;
+  private IUserService userService;
 
 
-  public WebSecurityConfig(UserService userService) {
+  public WebSecurityConfig(IUserService userService) {
     this.userService = userService;
   }
 

@@ -13,12 +13,11 @@
     <packaging>pom</packaging>
     <url>http://maven.apache.org</url>
     <modules>
-        <module>common</module>
-        <module>system</module>
-        <module>config</module>
         <module>gateway</module>
-        <module>system-api</module>
-        <module>schedule</module>
+        <module>service1</module>
+        <module>config</module>
+        <module>service1-api</module>
+        <module>service2</module>
         <module>hystrix-dashboard</module>
         <module>turbine</module>
     </modules>
@@ -53,65 +52,9 @@
             </dependency>
             <dependency>
                 <groupId>com.wangsong</groupId>
-                <artifactId>system-api</artifactId>
+                <artifactId>service1-api</artifactId>
                 <version>0.0.1-SNAPSHOT</version>
             </dependency>
-            <dependency>
-                <groupId>com.wangsong</groupId>
-                <artifactId>common</artifactId>
-                <version>0.0.1-SNAPSHOT</version>
-            </dependency>
-
-
-            <dependency>
-                <groupId>mysql</groupId>
-                <artifactId>mysql-connector-java</artifactId>
-                <version>5.1.42</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>druid-spring-boot-starter</artifactId>
-                <version>1.1.21</version>
-            </dependency>
-
-
-            <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-swagger2</artifactId>
-                <version>2.8.0</version>
-            </dependency>
-            <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-swagger-ui</artifactId>
-                <version>2.8.0</version>
-            </dependency>
-            <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
-            <dependency>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok</artifactId>
-                <version>1.18.2</version>
-            </dependency>
-
-
-            <dependency>
-                <groupId>io.jsonwebtoken</groupId>
-                <artifactId>jjwt</artifactId>
-                <version>0.9.1</version>
-            </dependency>
-            <!-- https://mvnrepository.com/artifact/cn.hutool/hutool-all -->
-            <dependency>
-                <groupId>cn.hutool</groupId>
-                <artifactId>hutool-all</artifactId>
-                <version>5.7.13</version>
-            </dependency>
-            <!-- https://mvnrepository.com/artifact/com.baomidou/mybatis-plus-boot-starter -->
-            <dependency>
-                <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus-boot-starter</artifactId>
-                <version>3.4.3.3</version>
-            </dependency>
-
         </dependencies>
     </dependencyManagement>
 

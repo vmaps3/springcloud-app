@@ -14,10 +14,10 @@
     <url>http://maven.apache.org</url>
     <modules>
         <module>gateway</module>
-        <module>service1</module>
+        <module>user</module>
         <module>config</module>
-        <module>service1-api</module>
-        <module>service2</module>
+        <module>user-api</module>
+        <module>order</module>
         <module>hystrix-dashboard</module>
         <module>turbine</module>
     </modules>
@@ -52,7 +52,7 @@
             </dependency>
             <dependency>
                 <groupId>com.wangsong</groupId>
-                <artifactId>service1-api</artifactId>
+                <artifactId>user-api</artifactId>
                 <version>0.0.1-SNAPSHOT</version>
             </dependency>
         </dependencies>
